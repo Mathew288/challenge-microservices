@@ -1,0 +1,14 @@
+<div class="modal" *ngIf="open" (click)="onBackdropClick($event)">
+    <div class="modal__panel" role="dialog" aria-modal="true">
+        <header class="modal__header">
+            <div class="modal__title">{{ title || 'Detalle' }}</div>
+            <button type="button" class="modal__close" (click)="close()" aria-label="Cerrar">
+                ✕
+            </button>
+        </header>
+
+        <div class="modal__content">
+            <ng-content />
+        </div>
+    </div>
+</div>

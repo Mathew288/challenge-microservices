@@ -1,0 +1,9 @@
+<label class="field" [class.field--error]="!!error">
+    <span class="field__label" *ngIf="label">{{ label }} <span *ngIf="required" class="field__req">*</span></span>
+
+    <input class="field__control" [id]="id" [type]="type" [placeholder]="placeholder || ''" [disabled]="disabled"
+        [value]="value ?? ''" (input)="onInput($event)" />
+
+    <span class="field__hint" *ngIf="!error && hint">{{ hint }}</span>
+    <span class="field__error" *ngIf="error">{{ error }}</span>
+</label>

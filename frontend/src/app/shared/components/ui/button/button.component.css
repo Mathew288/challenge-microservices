@@ -1,0 +1,72 @@
+.btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 160ms ease, border-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Tamaño pequeño (para acciones en tablas) */
+.btn--sm {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 10px;
+}
+
+.btn--primary {
+  background: var(--bp-blue);
+  color: #ffffff;
+  border-color: rgba(0, 51, 160, 0.35);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: rgba(0, 51, 160, 0.92);
+}
+
+.btn--secondary {
+  background: rgba(0, 51, 160, 0.08);
+  color: var(--bp-blue);
+  border-color: rgba(0, 51, 160, 0.20);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: rgba(0, 51, 160, 0.12);
+}
+
+.btn--danger {
+  background: rgba(217, 45, 32, 0.10);
+  color: var(--danger);
+  border-color: rgba(217, 45, 32, 0.25);
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: rgba(217, 45, 32, 0.14);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.04);
+}

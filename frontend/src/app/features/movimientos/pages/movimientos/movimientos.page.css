@@ -1,0 +1,232 @@
+.movs {
+  display: grid;
+  gap: 14px;
+}
+
+.movs__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.movs__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.movs__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.movs__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.movs__toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.movs__toolbarMeta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.movs__count {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.movs__content {
+  display: grid;
+  gap: 12px;
+}
+
+.movs__loading {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.movs__table {
+  position: relative;
+}
+
+/* Scroll horizontal */
+.tableScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.tableScroll__inner {
+  position: relative;
+  min-width: 1040px;
+}
+
+.movs__tableActions {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 132px;
+  padding-top: 41px;
+  display: grid;
+}
+
+.movs__tableActionRow {
+  height: 41px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.movs__rowActions {
+  pointer-events: all;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+/* Cards mobile */
+.movs__cards {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.movCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.movCard__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.movCard__title {
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.movCard__badge {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0, 51, 160, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(0, 51, 160, 0.18);
+  white-space: nowrap;
+}
+
+.movCard__badge.is-rejected {
+  background: rgba(217, 45, 32, 0.08);
+  color: var(--danger);
+  border-color: rgba(217, 45, 32, 0.20);
+}
+
+.movCard__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.movCard__label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.movCard__value {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.movCard__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Modal */
+.movForm {
+  display: grid;
+  gap: 14px;
+}
+
+.movForm__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.movForm__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Breakpoints */
+@media (max-width: 980px) {
+  .movs__toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .movs__toolbarMeta {
+    justify-content: space-between;
+  }
+
+  .movs__tableActions {
+    display: none;
+  }
+}
+
+@media (max-width: 780px) {
+  .movs__table {
+    display: none;
+  }
+
+  .movs__cards {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .movForm__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .movCard__actions {
+    justify-content: stretch;
+  }
+
+  .movCard__actions app-button {
+    width: 100%;
+  }
+}

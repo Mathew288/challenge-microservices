@@ -1,0 +1,137 @@
+<section class="rep">
+    <header class="rep__header">
+        <div>
+            <h1 class="rep__title">Reportes</h1>
+            <p class="rep__subtitle">Estado de cuenta por cliente y rango de fechas. Previsualiza y descarga el PDF.</p>
+        </div>
+
+        <div class="rep__actions">
+            <app-button variant="secondary" [disabled]="loading" [loading]="loading" (clicked)="loadClientes()">Recargar
+                clientes</app-button>
+        </div>
+    </header>
+
+    <app-alert *ngIf="error" type="error" [message]="error"></app-alert>
+
+    <section class="rep__filters">
+        <div class="repCard">
+            <div class="repCard__title">Filtros</div>
+
+            <form class="repForm" (submit)="$event.preventDefault(); consultar()">
+                <div class="repForm__grid">
+                    <app-select label="Cliente" [value]="form.clienteId" [options]="clienteOptions"
+                        [error]="formErrors.clienteId" [required]="true"
+                        (valueChange)="setField('clienteId', $event)"></app-select>
+
+                    <app-input label="Desde (opcional)" type="datetime-local" [value]="form.from"
+                        [error]="formErrors.from" (valueChange)="setField('from', $event)"></app-input>
+
+                    <app-input label="Hasta (opcional)" type="datetime-local" [value]="form.to" [error]="formErrors.to"
+                        (valueChange)="setField('to', $event)"></app-input>
+
+                </div>
+
+                <footer class="repForm__footer">
+                    <app-button variant="primary" type="submit" [disabled]="loading || !isFormValid"
+                        [loading]="loading">Consultar</app-button>
+                </footer>
+            </form>
+        </div>
+
+        <div class="repCard" *ngIf="reporte">
+            <div class="repCard__title">Resumen</div>
+
+            <div class="repSummary">
+                <div class="repSummary__item">
+                    <div class="repSummary__label">Cliente</div>
+                    <div class="repSummary__value">{{ reporte?.cliente?.nombre }}</div>
+                    <div class="repSummary__muted">{{ reporte?.cliente?.identificacion }}</div>
+                </div>
+
+                <div class="repSummary__item">
+                    <div class="repSummary__label">Rango</div>
+                    <div class="repSummary__value">
+                        {{ reporte?.from ? (reporte?.from | date : 'short') : '-' }} → {{ reporte?.to ? (reporte?.to |
+                        date : 'short')
+                        : '-' }}
+                    </div>
+                    <div class="repSummary__muted">{{ cuentas.length }} cuenta(s)</div>
+                </div>
+
+                <div class="repSummary__item">
+                    <div class="repSummary__label">Totales</div>
+                    <div class="repSummary__value">Créditos: {{ money(reporte?.totalCreditos || 0) }}</div>
+                    <div class="repSummary__muted">Débitos: {{ money(reporte?.totalDebitos || 0) }}</div>
+                </div>
+
+                <div class="repSummary__actions">
+                    <app-button variant="secondary" [disabled]="!pdfUrl" (clicked)="descargarPdf()">Descargar
+                        PDF</app-button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="rep__content" *ngIf="reporte">
+        <div class="repGrid">
+            <div class="repCard">
+                <div class="repCard__title">Movimientos (previsualización)</div>
+
+                <div class="repTable">
+                    <div class="tableScroll" role="region"
+                        aria-label="Tabla de movimientos del reporte (desliza horizontalmente)">
+                        <div class="tableScroll__inner">
+                            <app-table [columns]="columns" [rows]="movimientos" [rowKey]="rowKey"></app-table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="repCard repPdf">
+                <div class="repCard__title">PDF (previsualización)</div>
+
+                <div class="repPdf__empty" *ngIf="!pdfUrl">
+                    No hay PDF disponible para previsualizar.
+                </div>
+
+                <iframe *ngIf="pdfSafeUrl" class="repPdf__frame" [src]="pdfSafeUrl"></iframe>
+            </div>
+        </div>
+
+        <div class="repCard">
+            <div class="repCard__title">Cuentas</div>
+
+            <div class="repAccounts">
+                <article class="repAccount" *ngFor="let c of cuentas; trackBy: trackCuenta">
+                    <div class="repAccount__top">
+                        <div>
+                            <div class="repAccount__num">{{ c.numeroCuenta }}</div>
+                            <div class="repAccount__meta">{{ c.tipoCuenta }} · Saldo inicial: {{ money(c.saldoInicial)
+                                }} · Saldo actual:
+                                {{ money(c.saldoActual) }}</div>
+                        </div>
+
+                        <div class="repAccount__totals">
+                            <div class="repAccount__total">Créditos: {{ money(c.totalCreditos) }}</div>
+                            <div class="repAccount__total">Débitos: {{ money(c.totalDebitos) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="repAccount__movs">
+                        <div class="repAccount__mov" *ngFor="let m of c.movimientos">
+                            <div class="repAccount__movLeft">
+                                <div class="repAccount__movTitle">{{ fmtDate(m.fecha) }} · {{ m.tipoMovimiento }}</div>
+                                <div class="repAccount__movMuted">{{ m.estado }} · {{ m.movimientoId }}</div>
+                            </div>
+                            <div class="repAccount__movRight">
+                                <div class="repAccount__movValue">{{ moneySigned(m.tipoMovimiento, m.valor) }}</div>
+                                <div class="repAccount__movMuted">Saldo: {{ m.saldoDisponible == null ? '-' :
+                                    money(m.saldoDisponible) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+</section>

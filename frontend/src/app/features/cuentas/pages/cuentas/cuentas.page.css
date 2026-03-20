@@ -1,0 +1,296 @@
+.cuentas {
+  display: grid;
+  gap: 14px;
+}
+
+.cuentas__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cuentas__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.cuentas__subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cuentas__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.cuentas__toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.cuentas__toolbarMeta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.cuentas__count {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.cuentas__content {
+  display: grid;
+  gap: 12px;
+}
+
+.cuentas__loading {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.cuentas__table {
+  position: relative;
+}
+
+/* Scroll horizontal */
+.tableScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.tableScroll__inner {
+  position: relative;
+  min-width: 980px;
+}
+
+.tableScroll__inner .cuentas__tableActions {
+  right: 0;
+}
+
+.cuentas__tableActions {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 132px;
+  padding-top: 41px;
+  display: grid;
+}
+
+.cuentas__tableActionRow {
+  height: 41px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cuentas__rowActions {
+  pointer-events: all;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+/* Cards mobile */
+.cuentas__cards {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cuentaCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.cuentaCard__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cuentaCard__num {
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.cuentaCard__badge {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(6, 118, 71, 0.10);
+  color: var(--success);
+  border: 1px solid rgba(6, 118, 71, 0.20);
+  white-space: nowrap;
+}
+
+.cuentaCard__badge.is-inactive {
+  background: rgba(217, 45, 32, 0.08);
+  color: var(--danger);
+  border-color: rgba(217, 45, 32, 0.20);
+}
+
+.cuentaCard__badge {
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(6, 118, 71, 0.10);
+  color: var(--success);
+  border: 1px solid rgba(6, 118, 71, 0.20);
+  white-space: nowrap;
+}
+
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.switch__dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(217, 45, 32, 0.55);
+  box-shadow: 0 6px 14px rgba(217, 45, 32, 0.18);
+}
+
+.switch__text {
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.switch--on .switch__dot {
+  background: rgba(6, 118, 71, 0.85);
+  box-shadow: 0 6px 14px rgba(6, 118, 71, 0.18);
+}
+
+.cuentaCard__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cuentaCard__label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.cuentaCard__value {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cuentaCard__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Modal */
+.cuentaForm {
+  display: grid;
+  gap: 14px;
+}
+
+.cuentaForm__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Estado (switch) */
+.cuentaForm__estado {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 51, 160, 0.04);
+}
+
+.cuentaForm__estadoLabel {
+  font-weight: 900;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cuentaForm__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Breakpoints */
+@media (max-width: 980px) {
+  .cuentas__toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .cuentas__toolbarMeta {
+    justify-content: space-between;
+  }
+
+  .cuentas__tableActions {
+    display: none;
+  }
+}
+
+@media (max-width: 780px) {
+  .cuentas__table {
+    display: none;
+  }
+
+  .cuentas__cards {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cuentaForm__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cuentaCard__actions {
+    justify-content: stretch;
+  }
+
+  .cuentaCard__actions app-button {
+    width: 100%;
+  }
+}

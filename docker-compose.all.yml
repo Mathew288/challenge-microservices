@@ -1,0 +1,197 @@
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: challenge-api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ms-clientes
+      - ms-cuentas
+      - ms-movimientos
+    networks:
+      - challenge-net
+
+  # =====================
+  # Frontend (Angular + Nginx)
+  # =====================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: challenge-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - challenge-net
+
+  # =====================
+  # RabbitMQ
+  # =====================
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: challenge-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - challenge-net
+
+  # =====================
+  # ms-clientes + DB
+  # =====================
+  ms-clientes-db:
+    image: postgres:16-alpine
+    container_name: challenge-ms-clientes-db
+    environment:
+      POSTGRES_DB: ms_clientes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_ms_clientes_data:/var/lib/postgresql/data
+    networks:
+      - challenge-net
+
+  ms-clientes:
+    build:
+      context: ./ms-clientes
+      dockerfile: Dockerfile
+    container_name: challenge-ms-clientes-api
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ms-clientes-db:5432/ms_clientes
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    ports:
+      - "8081:8080"
+    depends_on:
+      - ms-clientes-db
+      - rabbitmq
+    networks:
+      - challenge-net
+
+  # =====================
+  # ms-cuentas + DB
+  # =====================
+  postgres-ms-cuentas:
+    image: postgres:16-alpine
+    container_name: challenge-ms-cuentas-db
+    environment:
+      POSTGRES_DB: ms_cuentas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_ms_cuentas_data:/var/lib/postgresql/data
+    networks:
+      - challenge-net
+
+  ms-cuentas:
+    build:
+      context: ./ms-cuentas
+      dockerfile: Dockerfile
+    container_name: challenge-ms-cuentas-api
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-ms-cuentas:5432/ms_cuentas
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres-ms-cuentas
+      - rabbitmq
+    networks:
+      - challenge-net
+
+  # =====================
+  # ms-movimientos + DB
+  # =====================
+  postgres-ms-movimientos:
+    image: postgres:16-alpine
+    container_name: challenge-ms-movimientos-db
+    environment:
+      POSTGRES_DB: ms_movimientos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_ms_movimientos_data:/var/lib/postgresql/data
+    networks:
+      - challenge-net
+
+  ms-movimientos:
+    build:
+      context: ./ms-movimientos
+      dockerfile: Dockerfile
+    container_name: challenge-ms-movimientos-api
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-ms-movimientos:5432/ms_movimientos
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      # En local/docker: usar update evita que el arranque falle si Flyway aún no creó tablas
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+
+      # RabbitMQ
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+
+      # Integraciones
+      APP_SERVICES_CUENTAS_BASE_URL: http://ms-cuentas:8080
+      APP_SERVICES_CLIENTES_BASE_URL: http://ms-clientes:8080
+
+      # Outbox publisher (nuevo)
+      APP_OUTBOX_PUBLISHER_ENABLED: "true"
+      APP_OUTBOX_PUBLISHER_FIXED_DELAY_MS: "1000"
+    ports:
+      - "8083:8080"
+    depends_on:
+      - postgres-ms-movimientos
+      - rabbitmq
+    networks:
+      - challenge-net
+
+volumes:
+  postgres_ms_clientes_data:
+  postgres_ms_cuentas_data:
+  postgres_ms_movimientos_data:
+
+networks:
+  challenge-net:
+    driver: bridge

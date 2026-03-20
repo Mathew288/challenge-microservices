@@ -1,0 +1,139 @@
+<section class="clientes">
+    <header class="clientes__header">
+        <div>
+            <h1 class="clientes__title">Clientes</h1>
+            <p class="clientes__subtitle">Administra clientes (crear, editar, eliminar) y realiza búsquedas rápidas.</p>
+        </div>
+
+        <div class="clientes__actions">
+            <app-button variant="primary" (clicked)="openCreate()">Nuevo cliente</app-button>
+        </div>
+    </header>
+
+    <app-alert *ngIf="error" type="error" [message]="error"></app-alert>
+
+    <section class="clientes__toolbar">
+        <app-input label="Búsqueda rápida" placeholder="Buscar por identificación, nombre, teléfono o dirección…"
+            [value]="query" (valueChange)="setQuery($event)"></app-input>
+
+        <div class="clientes__toolbarMeta">
+            <div class="clientes__count">{{ filtered.length }} resultados</div>
+            <app-button variant="secondary" [disabled]="loading" [loading]="loading"
+                (clicked)="load()">Recargar</app-button>
+        </div>
+    </section>
+
+    <section class="clientes__content">
+        <div class="clientes__loading" *ngIf="loading">Cargando clientes…</div>
+
+        <div *ngIf="!loading">
+            <!-- Desktop/tablet: tabla (con scroll horizontal si es necesario) -->
+            <div class="clientes__table">
+                <div class="tableScroll" role="region" aria-label="Tabla de clientes (desliza horizontalmente)">
+                    <div class="tableScroll__inner">
+                        <app-table [columns]="columns" [rows]="filtered" [rowKey]="rowKey"></app-table>
+
+                        <!-- Overlay de acciones por fila -->
+                        <div class="clientes__tableActions" aria-hidden="true">
+                            <div class="clientes__tableActionRow" *ngFor="let c of filtered">
+                                <div class="clientes__rowActions">
+                                    <app-button variant="ghost" size="sm" (clicked)="openEdit(c)">Editar</app-button>
+                                    <app-button variant="danger" size="sm" (clicked)="remove(c)">Eliminar</app-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile: cards (grid) -->
+            <div class="clientes__cards">
+                <article class="clienteCard" *ngFor="let c of filtered">
+                    <div class="clienteCard__top">
+                        <div class="clienteCard__name">{{ c.nombre }}</div>
+                        <div class="clienteCard__badge" [class.is-inactive]="!c.estado">{{ c.estado ? 'Activo' :
+                            'Inactivo' }}</div>
+                    </div>
+
+                    <div class="clienteCard__grid">
+                        <div class="clienteCard__field">
+                            <div class="clienteCard__label">Identificación</div>
+                            <div class="clienteCard__value">{{ c.identificacion }}</div>
+                        </div>
+                        <div class="clienteCard__field">
+                            <div class="clienteCard__label">Género</div>
+                            <div class="clienteCard__value">{{ c.genero }}</div>
+                        </div>
+                        <div class="clienteCard__field">
+                            <div class="clienteCard__label">Edad</div>
+                            <div class="clienteCard__value">{{ c.edad }}</div>
+                        </div>
+                        <div class="clienteCard__field">
+                            <div class="clienteCard__label">Teléfono</div>
+                            <div class="clienteCard__value">{{ c.telefono }}</div>
+                        </div>
+                        <div class="clienteCard__field clienteCard__field--full">
+                            <div class="clienteCard__label">Dirección</div>
+                            <div class="clienteCard__value">{{ c.direccion }}</div>
+                        </div>
+                    </div>
+
+                    <div class="clienteCard__actions">
+                        <app-button variant="ghost" (clicked)="openEdit(c)">Editar</app-button>
+                        <app-button variant="danger" (clicked)="remove(c)">Eliminar</app-button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <app-modal [open]="modalOpen" [title]="modalMode === 'create' ? 'Nuevo cliente' : 'Editar cliente'"
+        (closed)="closeModal()">
+        <form class="clienteForm" (submit)="$event.preventDefault(); save()">
+            <div class="clienteForm__grid">
+                <app-input label="Identificación" placeholder="Ej: 0102030405" [value]="form.identificacion"
+                    [error]="formErrors.identificacion" [required]="true"
+                    (valueChange)="setField('identificacion', $event)"></app-input>
+
+                <app-input label="Nombre" placeholder="Ej: Jose Lema" [value]="form.nombre" [error]="formErrors.nombre"
+                    [required]="true" (valueChange)="setField('nombre', $event)"></app-input>
+
+                <app-select label="Género" [value]="form.genero" [options]="generoOptions" [error]="formErrors.genero"
+                    [required]="true" (valueChange)="setField('genero', $event)"></app-select>
+
+                <app-input label="Edad" type="number" placeholder="Ej: 30" [value]="form.edad" [error]="formErrors.edad"
+                    [required]="true" (valueChange)="setField('edad', $event)"></app-input>
+
+                <app-input label="Dirección" placeholder="Ej: Otavalo sn y principal" [value]="form.direccion"
+                    [error]="formErrors.direccion" [required]="true"
+                    (valueChange)="setField('direccion', $event)"></app-input>
+
+                <app-input label="Teléfono" type="tel" placeholder="Ej: 098254785" [value]="form.telefono"
+                    [error]="formErrors.telefono" [required]="true"
+                    (valueChange)="setField('telefono', $event)"></app-input>
+
+                <app-input *ngIf="modalMode === 'create'" label="Contraseña" type="password" placeholder="••••••"
+                    [value]="form.password" [error]="formErrors.password" [required]="true"
+                    (valueChange)="setField('password', $event)"></app-input>
+
+                <app-input *ngIf="modalMode === 'edit'" label="Contraseña (opcional)" type="password"
+                    placeholder="Dejar vacío para no cambiar" [value]="form.password" [error]="formErrors.password"
+                    (valueChange)="setField('password', $event)"></app-input>
+
+                <div class="clienteForm__estado">
+                    <div class="clienteForm__estadoLabel">Estado</div>
+                    <button type="button" class="switch" [class.switch--on]="form.estado" (click)="toggleEstado()">
+                        <span class="switch__dot"></span>
+                        <span class="switch__text">{{ form.estado ? "Activo" : "Inactivo" }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <footer class="clienteForm__footer">
+                <app-button variant="ghost" (clicked)="closeModal()">Cancelar</app-button>
+                <app-button variant="primary" type="submit" [loading]="saving" [disabled]="saving || !isFormValid">{{
+                    modalMode === 'create' ? 'Crear' : 'Guardar' }}</app-button>
+            </footer>
+        </form>
+    </app-modal>
+</section>

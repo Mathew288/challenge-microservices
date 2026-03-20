@@ -1,0 +1,47 @@
+server:
+    port: 8080
+
+spring:
+    application:
+        name: ms-movimientos
+
+    datasource:
+        url: jdbc:postgresql://localhost:5435/ms_movimientos
+        username: postgres
+        password: postgres
+
+    jpa:
+        hibernate:
+            ddl-auto: validate
+        properties:
+            hibernate:
+                jdbc:
+                    time_zone: UTC
+
+    flyway:
+        enabled: true
+        locations: classpath:db/migration
+
+    rabbitmq:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
+
+app:
+    api:
+        version: "1.0"
+
+    outbox:
+        publisher:
+            fixed-delay-ms: 1000
+
+    messaging:
+        exchange: banking.events
+        queues:
+            cuentas: ms-movimientos.cuentas
+        routing-keys:
+            debito-solicitado: movimientos.debito-solicitado
+            credito-solicitado: movimientos.credito-solicitado
+            saldo-actualizado: cuentas.saldo-actualizado
+            saldo-rechazado: cuentas.saldo-rechazado

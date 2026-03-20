@@ -1,0 +1,12 @@
+<label class="field" [class.field--error]="!!error">
+    <span class="field__label" *ngIf="label">{{ label }} <span *ngIf="required" class="field__req">*</span></span>
+
+    <select class="field__control" [id]="id" [disabled]="disabled" [ngModel]="value"
+        (ngModelChange)="valueChange.emit($event)" [ngModelOptions]="{ standalone: true }">
+        <option value="">{{ placeholder }}</option>
+        <option *ngFor="let opt of options" [ngValue]="opt.value">{{ opt.label }}</option>
+    </select>
+
+    <span class="field__hint" *ngIf="!error && hint">{{ hint }}</span>
+    <span class="field__error" *ngIf="error">{{ error }}</span>
+</label>

@@ -1,0 +1,127 @@
+<section class="cuentas">
+    <header class="cuentas__header">
+        <div>
+            <h1 class="cuentas__title">Cuentas</h1>
+            <p class="cuentas__subtitle">
+                Crea cuentas y vincúlalas a un cliente. Administra (crear, editar, eliminar) y busca rápido.
+            </p>
+        </div>
+
+        <div class="cuentas__actions">
+            <app-button variant="primary" (clicked)="openCreate()">Nueva cuenta</app-button>
+        </div>
+    </header>
+
+    <app-alert *ngIf="error" type="error" [message]="error"></app-alert>
+
+    <section class="cuentas__toolbar">
+        <app-input label="Búsqueda rápida" placeholder="Buscar por número, tipo o cliente…" [value]="query"
+            (valueChange)="setQuery($event)"></app-input>
+
+        <div class="cuentas__toolbarMeta">
+            <div class="cuentas__count">{{ filtered.length }} resultados</div>
+            <app-button variant="secondary" [disabled]="loading" [loading]="loading"
+                (clicked)="loadAll()">Recargar</app-button>
+        </div>
+    </section>
+
+    <section class="cuentas__content">
+        <div class="cuentas__loading" *ngIf="loading">Cargando cuentas…</div>
+
+        <div *ngIf="!loading">
+            <!-- Desktop/tablet: tabla con scroll horizontal -->
+            <div class="cuentas__table">
+                <div class="tableScroll" role="region" aria-label="Tabla de cuentas (desliza horizontalmente)">
+                    <div class="tableScroll__inner">
+                        <app-table [columns]="columns" [rows]="filtered" [rowKey]="rowKey"></app-table>
+
+                        <!-- Overlay de acciones por fila -->
+                        <div class="cuentas__tableActions" aria-hidden="true">
+                            <div class="cuentas__tableActionRow" *ngFor="let a of filtered">
+                                <div class="cuentas__rowActions">
+                                    <app-button variant="ghost" size="sm" (clicked)="openEdit(a)">Editar</app-button>
+                                    <app-button variant="danger" size="sm" (clicked)="remove(a)">Eliminar</app-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile: cards -->
+            <div class="cuentas__cards">
+                <article class="cuentaCard" *ngFor="let a of filtered">
+                    <div class="cuentaCard__top">
+                        <div class="cuentaCard__num">{{ a.numeroCuenta }}</div>
+                        <div class="cuentaCard__badge" [class.is-inactive]="!a.estado">{{ a.estado ? 'Activa' :
+                            'Inactiva' }}</div>
+                    </div>
+
+                    <div class="cuentaCard__grid">
+                        <div class="cuentaCard__field">
+                            <div class="cuentaCard__label">Tipo</div>
+                            <div class="cuentaCard__value">{{ a.tipo }}</div>
+                        </div>
+
+                        <div class="cuentaCard__field">
+                            <div class="cuentaCard__label">Cliente</div>
+                            <div class="cuentaCard__value">{{ a.clienteNombre || a.clienteId }}</div>
+                        </div>
+
+                        <div class="cuentaCard__field">
+                            <div class="cuentaCard__label">Saldo inicial</div>
+                            <div class="cuentaCard__value">{{ money(a.saldoInicial) }}</div>
+                        </div>
+
+                        <div class="cuentaCard__field">
+                            <div class="cuentaCard__label">Saldo actual</div>
+                            <div class="cuentaCard__value">{{ money(a.saldoActual) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="cuentaCard__actions">
+                        <app-button variant="ghost" (clicked)="openEdit(a)">Editar</app-button>
+                        <app-button variant="danger" (clicked)="remove(a)">Eliminar</app-button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <app-modal [open]="modalOpen" [title]="modalMode === 'create' ? 'Nueva cuenta' : 'Editar cuenta'"
+        (closed)="closeModal()">
+        <form class="cuentaForm" (submit)="$event.preventDefault(); save()">
+            <div class="cuentaForm__grid">
+                <app-input label="Número de cuenta" placeholder="Ej: 478758" [value]="form.numeroCuenta"
+                    [error]="formErrors.numeroCuenta" [required]="true"
+                    (valueChange)="setField('numeroCuenta', $event)"></app-input>
+
+                <app-select label="Tipo de cuenta" [value]="form.tipo" [options]="tipoCuentaOptions"
+                    [error]="formErrors.tipo" [required]="true" (valueChange)="setField('tipo', $event)"></app-select>
+
+                <app-input label="Saldo inicial" type="number" placeholder="Ej: 2000" [value]="form.saldoInicial"
+                    [error]="formErrors.saldoInicial" [required]="true"
+                    (valueChange)="setField('saldoInicial', $event)"></app-input>
+
+                <app-select label="Cliente" [value]="form.clienteId" [options]="clienteOptions"
+                    [error]="formErrors.clienteId" [required]="true"
+                    (valueChange)="setField('clienteId', $event)"></app-select>
+
+                <div class="cuentaForm__estado">
+                    <div class="cuentaForm__estadoLabel">Estado</div>
+                    <button type="button" class="switch" [class.switch--on]="form.estado" (click)="toggleEstado()">
+                        <span class="switch__dot"></span>
+                        <span class="switch__text">{{ form.estado ? "Activo" : "Inactivo" }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <footer class="cuentaForm__footer">
+                <app-button variant="ghost" (clicked)="closeModal()">Cancelar</app-button>
+                <app-button variant="primary" type="submit" [loading]="saving" [disabled]="saving || !isFormValid">{{
+                    modalMode === 'create' ? 'Crear' : 'Guardar'
+                    }}</app-button>
+            </footer>
+        </form>
+    </app-modal>
+</section>

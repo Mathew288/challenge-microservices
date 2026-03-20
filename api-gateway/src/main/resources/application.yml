@@ -1,0 +1,50 @@
+server:
+    port: 8080
+
+spring:
+    application:
+        name: api-gateway
+
+    cloud:
+        gateway:
+            globalcors:
+                corsConfigurations:
+                    "[/**]":
+                        allowedOrigins:
+                            - "http://localhost:4200"
+                            - "http://localhost:5173"
+                            - "http://localhost:3000"
+                        allowedMethods:
+                            - GET
+                            - POST
+                            - PUT
+                            - PATCH
+                            - DELETE
+                            - OPTIONS
+                        allowedHeaders:
+                            - "*"
+                        exposedHeaders:
+                            - X-Correlation-Id
+                        allowCredentials: true
+
+            routes:
+                - id: ms-clientes
+                  uri: http://ms-clientes:8080
+                  predicates:
+                      - Path=/api/clientes,/api/clientes/**
+                  filters:
+                      - StripPrefix=1
+
+                - id: ms-cuentas
+                  uri: http://ms-cuentas:8080
+                  predicates:
+                      - Path=/api/cuentas,/api/cuentas/**
+                  filters:
+                      - StripPrefix=1
+
+                - id: ms-movimientos
+                  uri: http://ms-movimientos:8080
+                  predicates:
+                      - Path=/api/movimientos,/api/movimientos/**,/api/reportes,/api/reportes/**
+                  filters:
+                      - StripPrefix=1

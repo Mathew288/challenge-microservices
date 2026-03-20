@@ -1,0 +1,122 @@
+<section class="movs">
+    <header class="movs__header">
+        <div>
+            <h1 class="movs__title">Movimientos</h1>
+            <p class="movs__subtitle">Registra depósitos (crédito) y retiros (débito). Busca rápido y administra
+                movimientos.</p>
+        </div>
+
+        <div class="movs__actions">
+            <app-button variant="primary" (clicked)="openCreate()">Nuevo movimiento</app-button>
+        </div>
+    </header>
+
+    <app-alert *ngIf="error" type="error" [message]="error"></app-alert>
+
+    <section class="movs__toolbar">
+        <app-input label="Búsqueda rápida" placeholder="Buscar por cuenta, cliente, tipo o estado…" [value]="query"
+            (valueChange)="setQuery($event)"></app-input>
+
+        <div class="movs__toolbarMeta">
+            <div class="movs__count">{{ filtered.length }} resultados</div>
+            <app-button variant="secondary" [disabled]="loading" [loading]="loading"
+                (clicked)="loadAll()">Recargar</app-button>
+        </div>
+    </section>
+
+    <section class="movs__content">
+        <div class="movs__loading" *ngIf="loading">Cargando movimientos…</div>
+
+        <div *ngIf="!loading">
+            <!-- Desktop/tablet -->
+            <div class="movs__table">
+                <div class="tableScroll" role="region" aria-label="Tabla de movimientos (desliza horizontalmente)">
+                    <div class="tableScroll__inner">
+                        <app-table [columns]="columns" [rows]="filtered" [rowKey]="rowKey"></app-table>
+
+                        <div class="movs__tableActions" aria-hidden="true">
+                            <div class="movs__tableActionRow" *ngFor="let m of filtered">
+                                <div class="movs__rowActions">
+                                    <app-button variant="ghost" size="sm" (clicked)="openEdit(m)">Editar</app-button>
+                                    <app-button variant="danger" size="sm" (clicked)="remove(m)">Eliminar</app-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile -->
+            <div class="movs__cards">
+                <article class="movCard" *ngFor="let m of filtered">
+                    <div class="movCard__top">
+                        <div class="movCard__title">{{ m.cuentaNumero || m.cuentaId }}</div>
+                        <div class="movCard__badge" [class.is-rejected]="m.estado === 'REJECTED'">
+                            {{ m.estado }}
+                        </div>
+                    </div>
+
+                    <div class="movCard__grid">
+                        <div class="movCard__field">
+                            <div class="movCard__label">Fecha</div>
+                            <div class="movCard__value">{{ fmtDate(m.fecha) }}</div>
+                        </div>
+
+                        <div class="movCard__field">
+                            <div class="movCard__label">Cliente</div>
+                            <div class="movCard__value">{{ m.clienteNombre || '-' }}</div>
+                        </div>
+
+                        <div class="movCard__field">
+                            <div class="movCard__label">Tipo</div>
+                            <div class="movCard__value">{{ m.tipo }}</div>
+                        </div>
+
+                        <div class="movCard__field">
+                            <div class="movCard__label">Valor</div>
+                            <div class="movCard__value">{{ moneySigned(m.tipo, m.valor) }}</div>
+                        </div>
+
+                        <div class="movCard__field">
+                            <div class="movCard__label">Saldo</div>
+                            <div class="movCard__value">{{ money(m.saldoDisponible) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="movCard__actions">
+                        <app-button variant="ghost" (clicked)="openEdit(m)">Editar</app-button>
+                        <app-button variant="danger" (clicked)="remove(m)">Eliminar</app-button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <app-modal [open]="modalOpen" [title]="modalMode === 'create' ? 'Nuevo movimiento' : 'Editar movimiento'"
+        (closed)="closeModal()">
+        <form class="movForm" (submit)="$event.preventDefault(); save()">
+            <div class="movForm__grid">
+                <app-select label="Cliente" [value]="form.clienteId" [options]="clienteOptions"
+                    [error]="formErrors.clienteId" [required]="true"
+                    (valueChange)="setField('clienteId', $event)"></app-select>
+
+                <app-select label="Cuenta" [value]="form.cuentaId" [options]="cuentaOptions"
+                    [error]="formErrors.cuentaId" [required]="true"
+                    (valueChange)="setField('cuentaId', $event)"></app-select>
+
+                <app-select label="Tipo" [value]="form.tipo" [options]="tipoOptions" [error]="formErrors.tipo"
+                    [required]="true" (valueChange)="setField('tipo', $event)"></app-select>
+
+                <app-input label="Valor" type="number" placeholder="Ej: 600" [value]="form.valor"
+                    [error]="formErrors.valor" [required]="true" (valueChange)="setField('valor', $event)"></app-input>
+            </div>
+
+            <footer class="movForm__footer">
+                <app-button variant="ghost" (clicked)="closeModal()">Cancelar</app-button>
+                <app-button variant="primary" type="submit" [loading]="saving" [disabled]="saving || !isFormValid">{{
+                    modalMode === 'create' ? 'Crear' : 'Guardar'
+                    }}</app-button>
+            </footer>
+        </form>
+    </app-modal>
+</section>

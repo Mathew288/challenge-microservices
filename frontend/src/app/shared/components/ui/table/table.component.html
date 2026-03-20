@@ -1,0 +1,23 @@
+<div class="tableWrap">
+    <table class="table" *ngIf="rows?.length; else emptyTpl">
+        <thead class="table__head">
+            <tr>
+                <th *ngFor="let col of columns" [style.width]="col.width || null">
+                    {{ col.header }}
+                </th>
+            </tr>
+        </thead>
+
+        <tbody class="table__body">
+            <tr *ngFor="let row of rows; trackBy: trackByRow">
+                <td *ngFor="let col of columns">
+                    {{ cellText(col, row) }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ng-template #emptyTpl>
+        <div class="tableEmpty">{{ emptyText }}</div>
+    </ng-template>
+</div>
